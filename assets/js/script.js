@@ -27,13 +27,13 @@ function getApi(event) {
     //store geocode fetch into localStorage (This works!)
     let searchedGeocodeCity;
     if (!localStorage.getItem('searchedGeocodeCity')) {
-        searchedGeocodeCity = []; 
+        searchedGeocodeCity = [];
     }
 
     if (localStorage.getItem('searchedGeocodeCity')) {
         searchedGeocodeCity = JSON.parse(localStorage.getItem('searchedGeocodeCity'));
-    } 
-    const searchedCity = { 
+    }
+    const searchedCity = {
         city: searchEl.value.trim(),
     }
     searchedGeocodeCity.push(searchedCity);
@@ -52,17 +52,35 @@ function getCurrentWeatherApi(lat, lon) {
         .then(function (response) {
             return response.json();
         })
-        .then(function(data){
+        .then(function (data) {
             console.log(data);
             let temperature = data.main.temp;
             let humidity = data.main.humidity;
             let windSpeed = data.wind.speed;
             let icon = data.weather[0].icon; //needs a URL? check doc
             let iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+
+            //store 1 day fetch into local storage
+            let searched1day;
+            if (!localStorage.getItem('searched1day')) {
+                searched1day = [];
+            }
+
+            if (localStorage.getItem('searched1day')) {
+                searched1day = JSON.parse(localStorage.getItem('searched1day'));
+            }
+            const oneDayWeather = {
+                city: searchEl.value.trim(),
+                temperature: temperature,
+                humidity: humidity,
+                windSpeed: windSpeed,
+                icon: iconUrl // Use iconUrl instead of icon.value
+            };
+            
+            searched1day.push(oneDayWeather);
+            localStorage.setItem('searched1day', JSON.stringify(searched1day));
+            
         })
-
-    //store 1 day fetch into local storage
-
 };
 
 //5 day fetch: API call using 5 day weather
@@ -73,7 +91,7 @@ function getFiveDayWeatherApi(lat, lon) {
         .then(function (response) {
             return response.json();
         })
-        .then(function(data){
+        .then(function (data) {
             console.log(data); //this lets us see how the API names the variables we want and where they are embedded
             //day 1[0]
             let day1temp = data.list[0].main.temp;
