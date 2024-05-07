@@ -76,10 +76,10 @@ function getCurrentWeatherApi(lat, lon) {
                 windSpeed: windSpeed,
                 icon: iconUrl // Use iconUrl instead of icon.value
             };
-            
+
             searched1day.push(oneDayWeather);
             localStorage.setItem('searched1day', JSON.stringify(searched1day));
-            
+
         })
 };
 
@@ -127,12 +127,39 @@ function getFiveDayWeatherApi(lat, lon) {
             let day5windSpeed = data.list[4].wind.speed;
             let day5icon = data.list[4].weather[0].icon;
             let day5iconUrl = `https://openweathermap.org/img/wn/${day5icon}@2x.png`;
-        })
 
-    //store 5 day fetch into localStorage
+            //store day5 fetch into local storage
+            function storeWeatherData(dayNumber, data) {
+                let searched5day = [];
 
-}
+                if (!localStorage.getItem(`day${dayNumber}weather`)) {
+                    searched5day = [];
+                }
 
+                if (localStorage.getItem(`day${dayNumber}weather`)) {
+                    searched5day = JSON.parse(localStorage.getItem(`day${dayNumber}weather`));
+                }
+
+                const fiveDayWeather = {
+                    city: searchEl.value.trim(),
+                    temperature: data.main.temp,
+                    humidity: data.main.humidity,
+                    windSpeed: data.wind.speed,
+                    iconUrl: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
+                };
+
+                searched5day.push(fiveDayWeather);
+                localStorage.setItem(`day${dayNumber}weather`, JSON.stringify(searched5day));
+            };
+
+            // Call this function for each day's data
+            storeWeatherData(1, data.list[0]);
+            storeWeatherData(2, data.list[1]);
+            storeWeatherData(3, data.list[2]);
+            storeWeatherData(4, data.list[3]);
+            storeWeatherData(5, data.list[4]);
+        });
+};
 
 // prevent default + JSON for submission function
 submitEl.addEventListener('click', getApi);
