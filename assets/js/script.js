@@ -109,6 +109,39 @@ function getCurrentWeatherApi(lat, lon) {
             searched1day.push(oneDayWeather);
             localStorage.setItem('searched1day', JSON.stringify(searched1day));
 
+            //***render oneDay/current weather onto right side (replaceGIF)
+
+            //target class in HTML
+            const oneDayContainer = document.querySelector('.current-weather');
+
+            //set class equal to ' ' to empty gif in UI
+            oneDayContainer.innerHTML = '';
+
+            //create new elements
+            let currentCityName = document.createElement('h1');
+            currentCityName.textContent = oneDayWeather.city;
+            // currentCityName.style.fontSize = '30px';
+            // currentCityName.style.fontStyle = 'bold'; //might not work?
+            currentCityName.style.color = 'white';
+
+            let currentCityTemp = document.createElement('h3')
+            currentCityTemp.textContent = oneDayWeather.temperature;
+
+            let currentCityHum = document.createElement('h3');
+            currentCityHum.textContent = oneDayWeather.humidity;
+
+            let currentCityWindSpeed = document.createElement('h3');
+            currentCityWindSpeed.textContent = oneDayWeather.windSpeed;
+
+            let currentCityIcon = document.createElement('img');
+            currentCityIcon.src = iconUrl;
+
+            //append to render currentWeather
+            oneDayContainer.appendChild(currentCityName);
+            currentCityName.appendChild(currentCityTemp);
+            currentCityName.appendChild(currentCityHum);
+            currentCityName.appendChild(currentCityWindSpeed);
+            currentCityName.appendChild(currentCityIcon);
         })
 };
 
