@@ -119,19 +119,20 @@ function getCurrentWeatherApi(lat, lon) {
             //create new elements
             let currentCityName = document.createElement('h1');
             currentCityName.textContent = oneDayWeather.city;
-            currentCityName.style.color = 'beige';
+            currentCityName.style.color = 'yellow';
+            currentCityName.style.fontSize = '30px';
 
             let currentCityTemp = document.createElement('h3')
-            currentCityTemp.textContent = `${oneDayWeather.temperature} °F`;
-            currentCityTemp.style.color = 'white';
+            currentCityTemp.textContent = `${Math.round(oneDayWeather.temperature)} °F`;
+            currentCityTemp.style.color = 'beige';
 
             let currentCityHum = document.createElement('h3');
             currentCityHum.textContent = `${oneDayWeather.humidity} %`;
-            currentCityHum.style.color = 'white';
+            currentCityHum.style.color = 'beige';
 
             let currentCityWindSpeed = document.createElement('h3');
-            currentCityWindSpeed.textContent = `${oneDayWeather.windSpeed} MPH`;
-            currentCityWindSpeed.style.color = 'white';
+            currentCityWindSpeed.textContent = `${Math.round(oneDayWeather.windSpeed)} mph`;
+            currentCityWindSpeed.style.color = 'beige';
 
             let currentCityIcon = document.createElement('img');
             currentCityIcon.src = iconUrl;
@@ -222,58 +223,50 @@ function getFiveDayWeatherApi(lat, lon) {
             storeWeatherData(5, data.list[4]);
         });
 
-        // render stored weather data using for and for-of loop
-        function renderStoredWeatherData() {
-            for (let i = 1; i <= 5; i++) {
-                const storedData = JSON.parse(localStorage.getItem(`day${i}weather`));
-                
-                if (storedData) {
-                    for (const weatherData of storedData) {
-                        // Render the weather data for each day as needed
-                        console.log(`Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`);
-                        
-                        // create HTML elements and append
-                        //outer container
-                        let fiveDayContainer = document.createElement(`div`);
-                        fiveDayContainer.setAttribute('class', 'five-day-weather')
+    // render stored weather data using for and for-of loop
+    function renderStoredWeatherData() {
+        // Clear any existing content before rendering new data
+        const fiveContainer = document.querySelector('.five-day-weather');
+        fiveContainer.innerHTML = '';
 
-                        //inner container for each day
-                        let day1container = document.createElement(`div`);
-                        day1container.setAttribute('class', 'day-one');
+        for (let i = 1; i <= 5; i++) {
+            const storedData = JSON.parse(localStorage.getItem(`day${i}weather`));
 
-                        let day2container = document.createElement(`div`);
-                        day2container.setAttribute('class', 'day-two');
+            if (storedData) {
+                // create outer container for each day
+                let fiveDayContainer = document.createElement('div');
+                fiveDayContainer.setAttribute('class', 'five-day-weather');
 
-                        let day3container = document.createElement(`div`);
-                        day3container.setAttribute('class', 'day-three');
+                for (const weatherData of storedData) {
+                    // create inner container for each day
+                    let dayContainer = document.createElement('div');
+                    dayContainer.setAttribute('class', `day-${i}`);
 
-                        let day4container = document.createElement(`div`);
-                        day4container.setAttribute('class', 'day-four');
+                    // set the text content for each day's container
+                    // dayContainer.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
 
-                        let day5container = document.createElement(`div`);
-                        day5container.setAttribute('class', 'day-five');
+                    // Update the text content for each day's container with div elements
+                    dayContainer.innerHTML = `
+<div style="color:yellow; font-size:20px; font-weight:bold; padding-bottom: 10px;"> Day ${i} </div>
+<div>${Math.round(weatherData.temperature)} °F</div>
+<div>${weatherData.humidity}% humidity</div>
+<div>${Math.round(weatherData.windSpeed)} mph</div>
+<img src = "${weatherData.iconUrl}" alt ="weather icon" </img>
+`;
 
-                        //append elements to HTML
-                        document.body.appendChild(fiveDayContainer);
-                        fiveDayContainer.appendChild(day1container);
-                        fiveDayContainer.appendChild(day2container);
-                        fiveDayContainer.appendChild(day3container);
-                        fiveDayContainer.appendChild(day4container);
-                        fiveDayContainer.appendChild(day5container);
-
-                        day1container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
-                        day2container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
-                        day3container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
-                        day4container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
-                        day5container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
-                    }
+                    // append the inner container to the outer container
+                    fiveDayContainer.appendChild(dayContainer);
                 }
+
+                // append the outer container to the document body
+                fiveContainer.appendChild(fiveDayContainer);
             }
         }
-        
-        // Call the function to render the stored weather data
-        renderStoredWeatherData();
-    };
+    }
+
+    // Call the function to render the stored weather data
+    renderStoredWeatherData();
+};
 
 // prevent default + JSON for submission function
 submitEl.addEventListener('click', getApi);

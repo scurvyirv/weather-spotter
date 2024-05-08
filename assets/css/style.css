@@ -5,8 +5,28 @@
 /** header styling */
 
 header {
-    text-align: center;
-    text-size-adjust: 50px;
+    display: flex;
+    justify-content: space-between;
+    /* text-align: left; */
+    /* text-size-adjust: 50px; */
+    padding: 10px;
+    color: #264a64;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+}
+
+.header-picture {
+    display: flex;
+    align-items: center;
+}
+
+header div img {
+    width: 100px;
+    height: 100px;
+    margin-left: 10px;
 }
 
 /** section styling */
@@ -23,7 +43,8 @@ header {
     transition: 0.3s;
     width: 40%;
     background-color: #9acae4;
-    border-right: dashed 5px #264a64;
+    border: dashed 5px #264a64;
+    color: #264a64;
 }
 
 input {
@@ -52,18 +73,26 @@ button {
     transition: 0.3s;
     width: 60%;
     background-color: #264a64;
-    border-left: dashed 5px #9acae4;
+    border: dashed 5px #9acae4;
 }
 
 .current-weather {
     max-width: 100%;
 }
 
+.placeholder {
+    max-width: 100%;
+    max-height:100%;
+}
+
 /* creating grids for five day weather */
 .five-day-weather {
+    color: beige;
+    max-width: 100%;
     display: grid;
     grid-template-columns: repeat(5,1fr);
-    gap: 10px
+    gap: 10px;
+    overflow: hidden; /* this prevents grid content spillage! */
 }
 
 .day-one {
@@ -71,7 +100,6 @@ button {
     padding: 12px;
     background-color: #9acae4;
     border-radius: 7px;
-    float: left;
 }
 
 .day-two {
@@ -79,7 +107,6 @@ button {
     padding: 12px;
     background-color: #9acae4;
     border-radius: 7px;
-    float: left;
 }
 
 .day-three {
@@ -87,7 +114,6 @@ button {
     padding: 12px;
     background-color: #9acae4;
     border-radius: 7px;
-    float: left;
 }
 
 .day-four {
@@ -95,7 +121,6 @@ button {
     padding: 12px;
     background-color: #9acae4;
     border-radius: 7px;
-    float: left;
 }
 
 .day-five {
@@ -103,5 +128,4 @@ button {
     padding: 12px;
     background-color: #9acae4;
     border-radius: 7px;
-    float: left;
 }
