@@ -60,7 +60,7 @@ function getApi(event) {
         container.appendChild(cityButton);
     }
 
-    //clear container to remove duplicates...
+    //clear container to remove button duplicates...
     container.innerHTML = '';
 
     // Loop through each value in cityButtonNames and create a button for each value
@@ -110,7 +110,6 @@ function getCurrentWeatherApi(lat, lon) {
             localStorage.setItem('searched1day', JSON.stringify(searched1day));
 
             //***render oneDay/current weather onto right side (replaceGIF)
-
             //target class in HTML
             const oneDayContainer = document.querySelector('.current-weather');
 
@@ -120,28 +119,29 @@ function getCurrentWeatherApi(lat, lon) {
             //create new elements
             let currentCityName = document.createElement('h1');
             currentCityName.textContent = oneDayWeather.city;
-            // currentCityName.style.fontSize = '30px';
-            // currentCityName.style.fontStyle = 'bold'; //might not work?
-            currentCityName.style.color = 'white';
+            currentCityName.style.color = 'beige';
 
             let currentCityTemp = document.createElement('h3')
-            currentCityTemp.textContent = oneDayWeather.temperature;
+            currentCityTemp.textContent = `${oneDayWeather.temperature} °F`;
+            currentCityTemp.style.color = 'white';
 
             let currentCityHum = document.createElement('h3');
-            currentCityHum.textContent = oneDayWeather.humidity;
+            currentCityHum.textContent = `${oneDayWeather.humidity} %`;
+            currentCityHum.style.color = 'white';
 
             let currentCityWindSpeed = document.createElement('h3');
-            currentCityWindSpeed.textContent = oneDayWeather.windSpeed;
+            currentCityWindSpeed.textContent = `${oneDayWeather.windSpeed} MPH`;
+            currentCityWindSpeed.style.color = 'white';
 
             let currentCityIcon = document.createElement('img');
             currentCityIcon.src = iconUrl;
 
             //append to render currentWeather
             oneDayContainer.appendChild(currentCityName);
-            currentCityName.appendChild(currentCityTemp);
-            currentCityName.appendChild(currentCityHum);
-            currentCityName.appendChild(currentCityWindSpeed);
-            currentCityName.appendChild(currentCityIcon);
+            oneDayContainer.appendChild(currentCityTemp);
+            oneDayContainer.appendChild(currentCityHum);
+            oneDayContainer.appendChild(currentCityWindSpeed);
+            oneDayContainer.appendChild(currentCityIcon);
         })
 };
 
@@ -221,7 +221,59 @@ function getFiveDayWeatherApi(lat, lon) {
             storeWeatherData(4, data.list[3]);
             storeWeatherData(5, data.list[4]);
         });
-};
+
+        // render stored weather data using for and for-of loop
+        function renderStoredWeatherData() {
+            for (let i = 1; i <= 5; i++) {
+                const storedData = JSON.parse(localStorage.getItem(`day${i}weather`));
+                
+                if (storedData) {
+                    for (const weatherData of storedData) {
+                        // Render the weather data for each day as needed
+                        console.log(`Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`);
+                        
+                        // create HTML elements and append
+                        //outer container
+                        let fiveDayContainer = document.createElement(`div`);
+                        fiveDayContainer.setAttribute('class', 'five-day-weather')
+
+                        //inner container for each day
+                        let day1container = document.createElement(`div`);
+                        day1container.setAttribute('class', 'day-one');
+
+                        let day2container = document.createElement(`div`);
+                        day2container.setAttribute('class', 'day-two');
+
+                        let day3container = document.createElement(`div`);
+                        day3container.setAttribute('class', 'day-three');
+
+                        let day4container = document.createElement(`div`);
+                        day4container.setAttribute('class', 'day-four');
+
+                        let day5container = document.createElement(`div`);
+                        day5container.setAttribute('class', 'day-five');
+
+                        //append elements to HTML
+                        document.body.appendChild(fiveDayContainer);
+                        fiveDayContainer.appendChild(day1container);
+                        fiveDayContainer.appendChild(day2container);
+                        fiveDayContainer.appendChild(day3container);
+                        fiveDayContainer.appendChild(day4container);
+                        fiveDayContainer.appendChild(day5container);
+
+                        day1container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
+                        day2container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
+                        day3container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
+                        day4container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
+                        day5container.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
+                    }
+                }
+            }
+        }
+        
+        // Call the function to render the stored weather data
+        renderStoredWeatherData();
+    };
 
 // prevent default + JSON for submission function
 submitEl.addEventListener('click', getApi);

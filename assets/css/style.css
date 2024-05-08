@@ -15,7 +15,7 @@ header {
 }
 
 /* left side */
-.form-container {
+.left-container {
     /* display: flex; */
     margin: 10px 10px 10px 0;
     text-align: center;
@@ -44,7 +44,7 @@ button {
 }
 
 /* right side */
-.section-picture {
+.right-container {
     margin: 10px 10px 0 10px;
     text-align: center;
     align-content: center;
@@ -56,5 +56,52 @@ button {
 }
 
 .current-weather {
-    max-width: 80%;
+    max-width: 100%;
+}
+
+/* creating grids for five day weather */
+.five-day-weather {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 10px
+}
+
+.day-one {
+    text-align: center;
+    padding: 12px;
+    background-color: #9acae4;
+    border-radius: 7px;
+    float: left;
+}
+
+.day-two {
+    text-align: center;
+    padding: 12px;
+    background-color: #9acae4;
+    border-radius: 7px;
+    float: left;
+}
+
+.day-three {
+    text-align: center;
+    padding: 12px;
+    background-color: #9acae4;
+    border-radius: 7px;
+    float: left;
+}
+
+.day-four {
+    text-align: center;
+    padding: 12px;
+    background-color: #9acae4;
+    border-radius: 7px;
+    float: left;
+}
+
+.day-five {
+    text-align: center;
+    padding: 12px;
+    background-color: #9acae4;
+    border-radius: 7px;
+    float: left;
 }
