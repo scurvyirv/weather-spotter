@@ -39,6 +39,35 @@ function getApi(event) {
     searchedGeocodeCity.push(searchedCity);
 
     localStorage.setItem('searchedGeocodeCity', JSON.stringify(searchedGeocodeCity));
+
+    //***render button that has city name and functionally renders weather
+
+    //pull from local storage
+    const cityButtonNames = JSON.parse(localStorage.getItem('searchedGeocodeCity'));
+
+    //target HTML container in which button will be created
+    const container = document.getElementById('search-entries');
+
+    //define HTML elements using javascript
+    function createElement(searchedCity) {
+        const cityButton = document.createElement('button');
+        cityButton.textContent = searchedCity.city;
+
+        // Modify the style of the button element
+        cityButton.style.margin = '10px';
+        cityButton.style.fontSize = '20px';
+
+        container.appendChild(cityButton);
+    }
+
+    //clear container to remove duplicates...
+    container.innerHTML = '';
+
+    // Loop through each value in cityButtonNames and create a button for each value
+    cityButtonNames.forEach(function (searchedCity) {
+        createElement(searchedCity);
+    });
+
 };
 
 
