@@ -1,11 +1,11 @@
 // declare variables on form
-const searchEl = document.querySelector('#city-entry');
 const submitEl = document.querySelector('#submit');
 const apiKey = '504adfc304ab459bfc9e4d310d1aea32';
 
 //API call using geocode to locate long and lat
 function getApi(event) {
     event.preventDefault();
+    const searchEl = document.querySelector('#city-entry');
     //Geocode fetch request
     const requestGeocodeUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${searchEl.value}&limit=1&appid=${apiKey}`;
 
@@ -22,52 +22,56 @@ function getApi(event) {
             //invoke getCurrentWeatherApi AND getFiveDayWeatherApi ***this invocation corresponds to comment on manipulating how data moves
             getCurrentWeatherApi(latitude, longitude);
             getFiveDayWeatherApi(latitude, longitude);
+            storeGeocodeData(latitude,longitude);
+            renderCityButton(latitude, longitude);
         })
+};
 
-    //store geocode fetch into localStorage (This works!)
+//store geocode fetch into localStorage (This works!)
+function storeGeocodeData() {
     let searchedGeocodeCity;
+    const searchEl = document.querySelector('#city-entry');
     if (!localStorage.getItem('searchedGeocodeCity')) {
         searchedGeocodeCity = [];
     }
-
+        console.log('local storage?', searchedGeocodeCity);
     if (localStorage.getItem('searchedGeocodeCity')) {
-        searchedGeocodeCity = JSON.parse(localStorage.getItem('searchedGeocodeCity'));
-    }
-    const searchedCity = {
-        city: searchEl.value.trim(),
-    }
-    searchedGeocodeCity.push(searchedCity);
+            searchedGeocodeCity = JSON.parse(localStorage.getItem('searchedGeocodeCity'));
+        }
+        const searchedCity = {
+            city: searchEl.value.trim(),
+        }
+        console.log('local storage?', searchedGeocodeCity);
+        searchedGeocodeCity.push(searchedCity);
 
-    localStorage.setItem('searchedGeocodeCity', JSON.stringify(searchedGeocodeCity));
+        localStorage.setItem('searchedGeocodeCity', JSON.stringify(searchedGeocodeCity));
+        console.log('local storage?', searchedGeocodeCity);
+        
+};
 
-    //***render button that has city name and functionally renders weather
-
+//Render button that has city name and functionally renders weather
+function renderCityButton() {
     //pull from local storage
     const cityButtonNames = JSON.parse(localStorage.getItem('searchedGeocodeCity'));
-
-    //target HTML container in which button will be created
     const container = document.getElementById('search-entries');
 
-    //define HTML elements using javascript
-    function createElement(searchedCity) {
+    container.innerHTML = '';
+
+    // Loop through each cityButtonNames and create a button for each city  
+    cityButtonNames.forEach(function (searchedCity) {
         const cityButton = document.createElement('button');
         cityButton.textContent = searchedCity.city;
-
-        // Modify the style of the button element
         cityButton.style.margin = '10px';
         cityButton.style.fontSize = '20px';
 
+        cityButton.addEventListener('click', function () {
+            //call fetch API functions for current and fiveDay weather
+            getCurrentWeatherApi(searchedCity.lat, searchedCity.lon);
+            getFiveDayWeatherApi(searchedCity.lat, searchedCity.lon);
+        });
+        //append newly created button with new city entry
         container.appendChild(cityButton);
-    }
-
-    //clear container to remove button duplicates...
-    container.innerHTML = '';
-
-    // Loop through each value in cityButtonNames and create a button for each value
-    cityButtonNames.forEach(function (searchedCity) {
-        createElement(searchedCity);
-    });
-
+    })
 };
 
 
@@ -89,61 +93,57 @@ function getCurrentWeatherApi(lat, lon) {
             let icon = data.weather[0].icon; //needs a URL? check doc
             let iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
 
-            //store 1 day fetch into local storage
-            let searched1day;
-            if (!localStorage.getItem('searched1day')) {
-                searched1day = [];
-            }
-
-            if (localStorage.getItem('searched1day')) {
-                searched1day = JSON.parse(localStorage.getItem('searched1day'));
-            }
-            const oneDayWeather = {
+            const searchEl = document.querySelector('#city-entry');
+            //stores fetched current weather into an object
+            const currentWeather = {
                 city: searchEl.value.trim(),
                 temperature: temperature,
                 humidity: humidity,
                 windSpeed: windSpeed,
-                icon: iconUrl // Use iconUrl instead of icon.value
+                icon: iconUrl
             };
 
-            searched1day.push(oneDayWeather);
-            localStorage.setItem('searched1day', JSON.stringify(searched1day));
-
-            //***render oneDay/current weather onto right side (replaceGIF)
-            //target class in HTML
-            const oneDayContainer = document.querySelector('.current-weather');
-
-            //set class equal to ' ' to empty gif in UI
-            oneDayContainer.innerHTML = '';
-
-            //create new elements
-            let currentCityName = document.createElement('h1');
-            currentCityName.textContent = oneDayWeather.city;
-            currentCityName.style.color = 'yellow';
-            currentCityName.style.fontSize = '30px';
-
-            let currentCityTemp = document.createElement('h3')
-            currentCityTemp.textContent = `${Math.round(oneDayWeather.temperature)} °F`;
-            currentCityTemp.style.color = 'beige';
-
-            let currentCityHum = document.createElement('h3');
-            currentCityHum.textContent = `${oneDayWeather.humidity} %`;
-            currentCityHum.style.color = 'beige';
-
-            let currentCityWindSpeed = document.createElement('h3');
-            currentCityWindSpeed.textContent = `${Math.round(oneDayWeather.windSpeed)} mph`;
-            currentCityWindSpeed.style.color = 'beige';
-
-            let currentCityIcon = document.createElement('img');
-            currentCityIcon.src = iconUrl;
-
-            //append to render currentWeather
-            oneDayContainer.appendChild(currentCityName);
-            oneDayContainer.appendChild(currentCityTemp);
-            oneDayContainer.appendChild(currentCityHum);
-            oneDayContainer.appendChild(currentCityWindSpeed);
-            oneDayContainer.appendChild(currentCityIcon);
+            renderCurrentWeather(currentWeather);
         })
+        .catch(function (error) {
+            console.error('Error fetching data:', error);
+        });
+    console.log('current weather values of lat and lon are:', lat, lon);
+}
+
+
+// render current weather
+function renderCurrentWeather(currentWeather) {
+    const currentWeatherContainer = document.querySelector('.current-weather');
+    currentWeatherContainer.innerHTML = ''; //removes placeholder gif upon first entry
+
+    //create new elements
+    let currentCityName = document.createElement('h1');
+    currentCityName.textContent = currentWeather.city;
+    currentCityName.style.color = 'yellow';
+    currentCityName.style.fontSize = '30px';
+
+    let currentCityTemp = document.createElement('h3')
+    currentCityTemp.textContent = `${Math.round(currentWeather.temperature)} °F`;
+    currentCityTemp.style.color = 'beige';
+
+    let currentCityHum = document.createElement('h3');
+    currentCityHum.textContent = `${currentWeather.humidity} %`;
+    currentCityHum.style.color = 'beige';
+
+    let currentCityWindSpeed = document.createElement('h3');
+    currentCityWindSpeed.textContent = `${Math.round(currentWeather.windSpeed)} mph`;
+    currentCityWindSpeed.style.color = 'beige';
+
+    let currentCityIcon = document.createElement('img');
+    currentCityIcon.src = currentWeather.icon;
+
+    //append to render currentWeather
+    currentWeatherContainer.appendChild(currentCityName);
+    currentWeatherContainer.appendChild(currentCityTemp);
+    currentWeatherContainer.appendChild(currentCityHum);
+    currentWeatherContainer.appendChild(currentCityWindSpeed);
+    currentWeatherContainer.appendChild(currentCityIcon);
 };
 
 //5 day fetch: API call using 5 day weather
@@ -156,116 +156,70 @@ function getFiveDayWeatherApi(lat, lon) {
         })
         .then(function (data) {
             console.log(data); //this lets us see how the API names the variables we want and where they are embedded
-            //day 1[0]
-            let day1temp = data.list[0].main.temp;
-            let day1humidity = data.list[0].main.humidity;
-            let day1windSpeed = data.list[0].wind.speed;
-            let day1icon = data.list[0].weather[0].icon;
-            let day1iconUrl = `https://openweathermap.org/img/wn/${day1icon}@2x.png`;
 
-            //day 2[1]
-            let day2temp = data.list[1].main.temp;
-            let day2humidity = data.list[1].main.humidity;
-            let day2windSpeed = data.list[1].wind.speed;
-            let day2icon = data.list[1].weather[0].icon;
-            let day2iconUrl = `https://openweathermap.org/img/wn/${day2icon}@2x.png`;
+            //initialize array 
+            let fiveDayWeather = []
+            //loop for every 8th array in the list from the console
+            for (let i = 0; i < data.list.length; i += 8) {
+                let dayTemp = data.list[i].main.temp;
+                let dayHumidity = data.list[i].main.humidity;
+                let dayWindSpeed = data.list[i].wind.speed;
+                let dayIcon = data.list[i].weather[0].icon;
+                let dayIconUrl = `https://openweathermap.org/img/wn/${dayIcon}@2x.png`;
 
-            //day 3[2]
-            let day3temp = data.list[2].main.temp;
-            let day3humidity = data.list[2].main.humidity;
-            let day3windSpeed = data.list[2].wind.speed;
-            let day3icon = data.list[2].weather[0].icon;
-            let day3iconUrl = `https://openweathermap.org/img/wn/${day3icon}@2x.png`;
-
-            //day 4[3]
-            let day4temp = data.list[3].main.temp;
-            let day4humidity = data.list[3].main.humidity;
-            let day4windSpeed = data.list[3].wind.speed;
-            let day4icon = data.list[3].weather[0].icon;
-            let day4iconUrl = `https://openweathermap.org/img/wn/${day4icon}@2x.png`;
-
-            //day 5[4]
-            let day5temp = data.list[4].main.temp;
-            let day5humidity = data.list[4].main.humidity;
-            let day5windSpeed = data.list[4].wind.speed;
-            let day5icon = data.list[4].weather[0].icon;
-            let day5iconUrl = `https://openweathermap.org/img/wn/${day5icon}@2x.png`;
-
-            //store day5 fetch into local storage
-            function storeWeatherData(dayNumber, data) {
-                let searched5day = [];
-
-                if (!localStorage.getItem(`day${dayNumber}weather`)) {
-                    searched5day = [];
+                //store weather data for each day in an object
+                let dayWeather = {
+                    temp: dayTemp,
+                    humidity: dayHumidity,
+                    windSpeed: dayWindSpeed,
+                    icon: dayIcon,
+                    iconUrl: dayIconUrl
                 }
-
-                if (localStorage.getItem(`day${dayNumber}weather`)) {
-                    searched5day = JSON.parse(localStorage.getItem(`day${dayNumber}weather`));
-                }
-
-                const fiveDayWeather = {
-                    city: searchEl.value.trim(),
-                    temperature: data.main.temp,
-                    humidity: data.main.humidity,
-                    windSpeed: data.wind.speed,
-                    iconUrl: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
-                };
-
-                searched5day.push(fiveDayWeather);
-                localStorage.setItem(`day${dayNumber}weather`, JSON.stringify(searched5day));
-            };
-
-            // Call this function for each day's data
-            storeWeatherData(1, data.list[0]);
-            storeWeatherData(2, data.list[1]);
-            storeWeatherData(3, data.list[2]);
-            storeWeatherData(4, data.list[3]);
-            storeWeatherData(5, data.list[4]);
-        });
-
-    // render stored weather data using for and for-of loop
-    function renderStoredWeatherData() {
-        // Clear any existing content before rendering new data
-        const fiveContainer = document.querySelector('.five-day-weather');
-        fiveContainer.innerHTML = '';
-
-        for (let i = 1; i <= 5; i++) {
-            const storedData = JSON.parse(localStorage.getItem(`day${i}weather`));
-
-            if (storedData) {
-                // create outer container for each day
-                let fiveDayContainer = document.createElement('div');
-                fiveDayContainer.setAttribute('class', 'five-day-weather');
-
-                for (const weatherData of storedData) {
-                    // create inner container for each day
-                    let dayContainer = document.createElement('div');
-                    dayContainer.setAttribute('class', `day-${i}`);
-
-                    // set the text content for each day's container
-                    // dayContainer.textContent = `Day ${i}: City - ${weatherData.city}, Temperature - ${weatherData.temperature} °F, Humidity - ${weatherData.humidity}%`;
-
-                    // Update the text content for each day's container with div elements
-                    dayContainer.innerHTML = `
-<div style="color:yellow; font-size:20px; font-weight:bold; padding-bottom: 10px;"> Day ${i} </div>
-<div>${Math.round(weatherData.temperature)} °F</div>
-<div>${weatherData.humidity}% humidity</div>
-<div>${Math.round(weatherData.windSpeed)} mph</div>
-<img src = "${weatherData.iconUrl}" alt ="weather icon" </img>
-`;
-
-                    // append the inner container to the outer container
-                    fiveDayContainer.appendChild(dayContainer);
-                }
-
-                // append the outer container to the document body
-                fiveContainer.appendChild(fiveDayContainer);
+                //push weather data for each day into fiveDayWeather array
+                fiveDayWeather.push(dayWeather)
             }
-        }
+            // check array of fiveDayWeather
+            console.log(fiveDayWeather);
+            renderFiveDayWeather(fiveDayWeather);
+        })
+        .catch(function (error) {
+            console.error('Error fetching data:', error);
+        });
+    console.log('fiveDayWeather values of lat and lon are:', lat, lon);
+};
+
+//render five day weather
+function renderFiveDayWeather(fiveDayWeather) {
+    const fiveDayWeatherContainer = document.querySelector('.five-day-weather');
+    fiveDayWeatherContainer.innerHTML = '';
+
+    // loop through five day weather data
+    for (let i = 0; i < fiveDayWeather.length; i++) {
+
+        // create outer container for holding five day weather data
+        let fiveDayContainer = document.createElement('div');
+        fiveDayContainer.setAttribute('class', 'five-day-weather');
+
+        // create inner container for each day
+        let dayContainer = document.createElement('div');
+        dayContainer.setAttribute('class', `day-${i}`);
+
+        // Update the text content for each day's container with div elements
+        dayContainer.innerHTML = `
+        <div style="color:yellow; font-size:20px; font-weight:bold; padding-bottom: 10px;"> Day ${i + 1} </div>
+        <div>${Math.round(fiveDayWeather[i].temp)} °F</div>
+        <div>${fiveDayWeather[i].humidity}% humidity</div>
+        <div>${Math.round(fiveDayWeather[i].windSpeed)} mph</div>
+        <img src = "${fiveDayWeather[i].iconUrl}" alt ="weather icon" </img>
+        `;
+
+        // append the inner container to the outer container
+        fiveDayContainer.appendChild(dayContainer);
+
+        // append the outer container to the document body
+        fiveDayWeatherContainer.appendChild(fiveDayContainer);
     }
 
-    // Call the function to render the stored weather data
-    renderStoredWeatherData();
 };
 
 // prevent default + JSON for submission function
