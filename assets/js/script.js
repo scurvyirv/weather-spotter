@@ -28,24 +28,23 @@ function getApi(event) {
 };
 
 //store geocode fetch into localStorage (This works!)
-function storeGeocodeData() {
+function storeGeocodeData(latitude, longitude) {
     let searchedGeocodeCity;
     const searchEl = document.querySelector('#city-entry');
     if (!localStorage.getItem('searchedGeocodeCity')) {
         searchedGeocodeCity = [];
     }
-        console.log('local storage?', searchedGeocodeCity);
     if (localStorage.getItem('searchedGeocodeCity')) {
             searchedGeocodeCity = JSON.parse(localStorage.getItem('searchedGeocodeCity'));
         }
         const searchedCity = {
             city: searchEl.value.trim(),
-        }
-        console.log('local storage?', searchedGeocodeCity);
+            lat: latitude,
+            lon: longitude
+        };
         searchedGeocodeCity.push(searchedCity);
-
         localStorage.setItem('searchedGeocodeCity', JSON.stringify(searchedGeocodeCity));
-        console.log('local storage?', searchedGeocodeCity);
+        
         
 };
 
@@ -78,8 +77,8 @@ function renderCityButton() {
 // ***we are manipulating how data moves around by making use of arguments in previously invoked function of the same name 'getCurrentWeatherApi(argument1, argument2)
 
 //1 day fetch: API call using 1 day weather
-function getCurrentWeatherApi(lat, lon) {
-    const requestCurrentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
+function getCurrentWeatherApi(latitude, longitude) {
+    const requestCurrentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=imperial&appid=${apiKey}`;
 
     fetch(requestCurrentWeatherUrl)
         .then(function (response) {
@@ -100,7 +99,9 @@ function getCurrentWeatherApi(lat, lon) {
                 temperature: temperature,
                 humidity: humidity,
                 windSpeed: windSpeed,
-                icon: iconUrl
+                icon: iconUrl,
+                lat: latitude,
+                lon: longitude
             };
 
             renderCurrentWeather(currentWeather);
@@ -108,7 +109,6 @@ function getCurrentWeatherApi(lat, lon) {
         .catch(function (error) {
             console.error('Error fetching data:', error);
         });
-    console.log('current weather values of lat and lon are:', lat, lon);
 }
 
 
@@ -147,8 +147,8 @@ function renderCurrentWeather(currentWeather) {
 };
 
 //5 day fetch: API call using 5 day weather
-function getFiveDayWeatherApi(lat, lon) {
-    const requestFiveDayUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
+function getFiveDayWeatherApi(latitude, longitude) {
+    const requestFiveDayUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=imperial&appid=${apiKey}`;
 
     fetch(requestFiveDayUrl)
         .then(function (response) {
@@ -158,7 +158,7 @@ function getFiveDayWeatherApi(lat, lon) {
             console.log(data); //this lets us see how the API names the variables we want and where they are embedded
 
             //initialize array 
-            let fiveDayWeather = []
+            let fiveDayWeather = [];
             //loop for every 8th array in the list from the console
             for (let i = 0; i < data.list.length; i += 8) {
                 let dayTemp = data.list[i].main.temp;
@@ -173,7 +173,9 @@ function getFiveDayWeatherApi(lat, lon) {
                     humidity: dayHumidity,
                     windSpeed: dayWindSpeed,
                     icon: dayIcon,
-                    iconUrl: dayIconUrl
+                    iconUrl: dayIconUrl,
+                    lat: latitude,
+                    lon: longitude
                 }
                 //push weather data for each day into fiveDayWeather array
                 fiveDayWeather.push(dayWeather)
@@ -185,7 +187,6 @@ function getFiveDayWeatherApi(lat, lon) {
         .catch(function (error) {
             console.error('Error fetching data:', error);
         });
-    console.log('fiveDayWeather values of lat and lon are:', lat, lon);
 };
 
 //render five day weather
