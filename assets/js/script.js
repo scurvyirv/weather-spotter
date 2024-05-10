@@ -7,7 +7,7 @@ function getApi(event) {
     event.preventDefault();
     const searchEl = document.querySelector('#city-entry');
     //Geocode fetch request
-    const requestGeocodeUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${searchEl.value}&limit=1&appid=${apiKey}`;
+    const requestGeocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${searchEl.value}&limit=1&appid=${apiKey}`;
 
     fetch(requestGeocodeUrl)
         .then(function (response) {
